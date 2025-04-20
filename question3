@@ -1,0 +1,13 @@
+ Question 3: Do Django signals run in the same database transaction as the caller?
+Answer:
+Yes — if the signal is emitted inside a transaction, it runs in the same transaction unless you explicitly use @transaction.on_commit.
+#code
+# signals.py
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.db import connection
+from django.contrib.auth.models import User
+
+@receiver(post_save, sender=User)
+def my_handler(sender, instance, **kwargs):
+    print("Signal inside transaction:", connection.in_atomic_block)
